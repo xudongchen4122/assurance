@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <script>
+        const minimum_number_players = {{ minimum_number_players }};
+        setInterval(updateStopWatch, 1000); // every second call updateStopWatch
+        function updateStopWatch(){
+            let numbers = $('#stop_watch').text().split(':')
+            let hour = parseInt(numbers[0])
+            let minute = parseInt(numbers[1])
+            let second = parseInt(numbers[2])
+            second += 1
+            if (second === 60) {
+                second = 0;
+                minute += 1;
+            }
+            if (minute === 60) {
+                minute = 0;
+                hour += 1
+            }
+            let temp = hour.toString() + ':';
+            if (minute < 10){
+                temp += '0'
+            }
+            temp += minute.toString() + ':';
+            if (second < 10){
+                temp += '0'
+            }
+            temp += second.toString();
+            $('#stop_watch').text(temp);
+
+            const game_id = parseInt($('#game_id').val())
+            $.ajax({
+                type: "GET",
+                url: 'http://127.0.0.1:8000/players/?game='+game_id+'&status=started',
+                success: function (players) {
+                    if(players) {
+                        let player_string = ''
+                        for (let i=0; i<players.length; i++){
+                            temp = i == 0 ? players[i].user.username : ', ' + players[i].user.username;
+                            player_string += '<span style="font-size: 14px;">' + temp +'</span>'
+                        }
+                        $('#player_list').innerHTML = player_string;
+
+                        const game_started = $('#game_started').val();
+                        if (game_started == 'false') {
+                            if (players.length >= minimum_number_players) {
+                                window.location = 'http://127.0.0.1:8000/play_game/?game='+game_id+'&round=0';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function sendAnswer(player_id, round_id) {
+            const choice_id = $('input[name=choices]:checked').val()
+            $.ajax({
+                type: "POST",
+                url: 'http://127.0.0.1:8000/answers/',
+                data: {
+                    'player': player_id,
+                    'round': round_id,
+                    'choice': parseInt(choice_id)
+                },
+                success: function (data) {
+                    if(data){
+                        let id=data['id'];
+                        window.open('http://127.0.0.1:8000/play_game/?game='+id+'&round=' + (round_id + 1));
+                    }
+                }
+            }) ;
+
+        }
+    </script>
+    <input type="hidden" id="game_id" value="{{ game.id }}">
+    {% if players|length >= minimum_number_players %}
+        <input type="hidden" id="game_started" value="true">
+    {% else %}
+        <input type="hidden" id="game_started" value="false">
+    {% endif %}
+    <div class="container">
+        <div class="jumbotron row">
+            <div class="col-md-9">
+                <h1>Hello, {{user.username}}</h1>
+                <p>Trivia: Fun Online Trivia Game!</p>
+            </div>
+            <div id="stop_watch" class="col-md-3 text-right " style="vertical-align: middle;font-size: 60px">0:00:00</div>
+        </div>
+    </div>
+
+    <div class="container" style="width:50%">
+    <h2>Game #{{ game.id }}</h2>
+    <div>
+        <span style="font-size:16px;" id="player_list">Players:</span>
+        {% for player in players %}
+            <span style="font-size: 14px;">{% if forloop.counter > 1 %}, {% endif %}{{ player.user.username }}</span>
+        {% endfor %}
+    </div>
+    <br>
+    {% if players|length < minimum_number_players %}
+        <div style="vertical-align: middle">
+            <img style="width:50px;height: 50px;" src='{% static "spinner.gif"%}' alt="'waiting"/>
+            <span style="margin-left: 10px;">Please wait for more player(s) to start the game...</span>
+        </div>
+    {% else %}
+        <div>
+            <h4>Question {{ round.order }}: {{ question.description }}</h4>
+            <div style="margin-bottom: 50px">
+                <fieldset id="choices">
+                    {% for choice in choices %}
+                        <div style="margin-left: 50px;margin-top:10px;margin-bottom:10px; font-size: medium">
+                            <input id="id_{{ choice.id }}" type="radio" value="{{ choice.id }}" name="choices">
+                            <label style="margin-left:10px;" for="id_{{ choice.id }}">{{ choice.description }}</label>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+
+            </div>
+            <button class="btn btn-lg btn-primary" onclick="sendAnswer({{ player.id }},{{ round.id }})">Submit</button>
+        </div>
+    {% endif %}
+{% endblock %}

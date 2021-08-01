@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <script>
+        function startGame(){
+            $.ajax({
+                type: "POST",
+                url: 'http://127.0.0.1:8000/games/',
+                success: function (data) {
+                    if(data){
+                        let id=data['id'];
+                        window.open('http://127.0.0.1:8000/play_game/?game='+id+'&round=0');
+                    }
+                }
+            }) ;
+        }
+        function joinGame(game_id){
+            window.open('http://127.0.0.1:8000/play_game/?game='+game_id+'&round=0');
+        }
+    </script>
+    <div class="container">
+      <div class="jumbotron">
+          <h1>Hello, {{user.username}}</h1>
+        <p>Trivia: Fun Online Trivia Game!</p>
+        </div>
+    </div>
+
+    <div class="container" style="width:40%">
+    <h3>Game List</h3>
+    {% for game in games %}
+        <button class="btn btn-primary btn-lg" style="height:80px;width:250px;margin-right:50px;margin-top:25px;margin-bottom:25px;"
+                onclick="joinGame({{ game.id }});">Join Game #{{ game.id }}</button>
+
+    {% endfor %}
+    {%  for i in '1234'|make_list %}
+        <button class="btn btn-primary btn-lg" style="height:80px;width:250px;margin-right:50px;margin-top:25px;margin-bottom:25px;"
+                onclick="startGame();">Start Game</button>
+    {% endfor %}
+
+
+{% endblock %}
