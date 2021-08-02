@@ -14,9 +14,6 @@ class GameSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        if validated_data['name'].strip == '':
-            raise Exception('game.name cannot be whitespace')
-
         game = Game(**validated_data)
         game.save()
         self._create_rounds(game)
