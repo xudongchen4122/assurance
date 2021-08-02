@@ -84,28 +84,19 @@ def signup(request):
 def play_game(request):
     if request.user.is_authenticated:
         game_id = request.GET['game']
-        current_round = int(request.GET['round']) + 1
+        current_round = int(request.GET['round'])
         game = Game.objects.filter(pk=game_id).first()
         rounds = Round.objects.filter(game=game).all()
 
         used_questions = [round.question_id for round in rounds]
         questions = Question.objects.all()
-        not_used_questions = [question for question in questions if question.id not in used_questions]
-        question = random.choice(not_used_questions)
 
         player = Player.objects.filter(game=game, user=request.user).first()
         rounds = list(rounds)
         rounds.sort(key=lambda round:-round.order)
 
-        if current_round > rounds[0].order:
-            new_round = Round(
-                game=game,
-                question=question,
-                order=1 if len(rounds) == 0 else rounds[0].order + 1
-            )
-            new_round.save()
-        else:
-            new_round = rounds[0]
+        new_round = [round for round in rounds if round.order == current_round][0]
+        question = [question for question in questions if question.id == new_round.question_id][0]
 
         choices = Choice.objects.filter(question=question.id).all()
 

@@ -5,6 +5,9 @@
     <script>
         const minimum_number_players = {{ minimum_number_players }};
         setInterval(updateStopWatch, 1000); // every second call updateStopWatch
+        let new_game_time = 5
+        let interval_answer = 0
+
         function updateStopWatch(){
             let numbers = $('#stop_watch').text().split(':')
             let hour = parseInt(numbers[0])
@@ -46,34 +49,28 @@
                         const game_started = $('#game_started').val();
                         if (game_started == 'false') {
                             if (players.length >= minimum_number_players) {
-                                window.location = 'http://127.0.0.1:8000/play_game/?game='+game_id+'&round=0';
+                                window.location = 'http://127.0.0.1:8000/play_game/?game='+game_id+'&round=1';
                             }
                         }
                     }
                 }
             });
         }
-        function sendAnswer(player_id, round_id) {
+        function handleNext(game_id, round_id) {
             const choice_id = $('input[name=choices]:checked').val()
-            $.ajax({
-                type: "POST",
-                url: 'http://127.0.0.1:8000/answers/',
-                data: {
-                    'player': player_id,
-                    'round': round_id,
-                    'choice': parseInt(choice_id)
-                },
-                success: function (data) {
-                    if(data){
-                        let id=data['id'];
-                        window.open('http://127.0.0.1:8000/play_game/?game='+id+'&round=' + (round_id + 1));
-                    }
-                }
-            }) ;
-
+            if (choice_id) {
+                window.location = 'http://127.0.0.1:8000/play_game/?game='+game_id+'&round=' + (round_id + 1);
+            } else {
+                alert('You must submit an answer first!');
+            }
         }
     </script>
     <input type="hidden" id="game_id" value="{{ game.id }}">
+    <input type="hidden" id="round_id" value="{{ round.id }}">
+    <input type="hidden" id="hide_submit" value="false">
+    <input type="hidden" id=" hide_next" value="true">
+    <input type="hidden" id="wrong_answer" value="false">
+    <input type="hidden" id="alert_time" value="0">
     {% if players|length >= minimum_number_players %}
         <input type="hidden" id="game_started" value="true">
     {% else %}
@@ -117,7 +114,64 @@
                 </fieldset>
 
             </div>
-            <button class="btn btn-lg btn-primary" onclick="sendAnswer({{ player.id }},{{ round.id }})">Submit</button>
+            <button id="'btnSubmit" class="btn btn-lg btn-primary" onclick="sendAnswer({{ player.id }},{{ round.id }})">Submit</button>
+            <button id="'btnNext" class="btn btn-lg btn-primary" style="margin-left: 200px;" onclick="handleNext({{ game.id }},{{ round.id }})">Next Question</button>
+            <div id="'game_over" style="display: none;font-size: 20px;">Wrong Answer! Game OVer!</div>
+            <div id="result" style="display: none;">
+                <div style="font-size: 20px;margin-top: 30px;">Results</div>
+                {% for choice in choices %}
+                    <div style="margin-top:10px;margin-bottom:10px; font-size: medium">
+                        <span style="margin-left:10px;">{{ choice.description }} :</span>
+                        <span id="answer_{{ choice.id }}"></span>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
+    <script>
+        $(document).ready(function() {
+            let hide_submit = $('#hide_submit').val();
+            let hide_next = $('#hide_next').val();
+
+            if(hide_submit == 'true'){
+                $('#btnSubmit').hide();
+            }
+            if(hide_next == 'false'){
+                $('#btnNext').show();
+            }
+        })
+        function sendAnswer(player_id, round_id) {
+            const choice_id = $('input[name=choices]:checked').val()
+
+            if (choice_id) {
+                $('#btnSubmit').hide();
+                $('#hide_submit').val('true')
+
+                $.ajax({
+                    type: "POST",
+                    url: 'http://127.0.0.1:8000/answers/',
+                    data: {
+                        'player_id': player_id,
+                        'round': round_id,
+                        'choice': parseInt(choice_id)
+                    },
+                    success: function (answer) {
+                        if(answer){
+                            interval_answer = setInterval(updateResult, 1000)
+                            if(answer.correct_answer == true){
+                                $('#btnNext').show();
+                                $('#hide_next').val('false');
+                            } else {
+                                $('#game_over').show();
+                                $('#wrong_answer').val('true');
+                                updateResult();
+                            }
+                        }
+                    }
+                }) ;
+            } else {
+                alert('You must submit an answer first!');
+            }
+        }
+    </script>
 {% endblock %}

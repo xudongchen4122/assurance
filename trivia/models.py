@@ -38,3 +38,4 @@ class Answer(models.Model):
     round = models.ForeignKey('Round', related_name='answers', on_delete=models.CASCADE, null=False, blank=False)
     choice = models.ForeignKey('Choice', related_name='answers', on_delete=models.CASCADE, null=False, blank=False)
     create_date = models.DateTimeField(auto_now_add=True)
+    correct_answer = models.BooleanField(null=False, blank=False, default=False)

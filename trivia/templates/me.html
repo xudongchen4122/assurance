@@ -10,13 +10,13 @@
                 success: function (data) {
                     if(data){
                         let id=data['id'];
-                        window.open('http://127.0.0.1:8000/play_game/?game='+id+'&round=0');
+                        window.open('http://127.0.0.1:8000/play_game/?game='+id+'&round=1');
                     }
                 }
             }) ;
         }
         function joinGame(game_id){
-            window.open('http://127.0.0.1:8000/play_game/?game='+game_id+'&round=0');
+            window.open('http://127.0.0.1:8000/play_game/?game='+game_id+'&round=1');
         }
     </script>
     <div class="container">
