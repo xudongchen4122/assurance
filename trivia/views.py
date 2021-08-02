@@ -95,8 +95,18 @@ def play_game(request):
         rounds = list(rounds)
         rounds.sort(key=lambda round:-round.order)
 
-        new_round = [round for round in rounds if round.order == current_round][0]
-        question = [question for question in questions if question.id == new_round.question_id][0]
+        if len(rounds) == 0 or current_round > rounds[0].order:
+            not_used_questions = [question for question in questions if question.id not in used_questions]
+            question = random.choice(not_used_questions)
+            new_round = Round(
+                game=game,
+                question=question,
+                order=1 if len(rounds) == 0 else rounds[0].order + 1
+            )
+            new_round.save()
+        else:
+            new_round = [round for round in rounds if round.order == current_round][0]
+            question = [question for question in questions if question.id == new_round.question_id][0]
 
         choices = Choice.objects.filter(question=question.id).all()
 
