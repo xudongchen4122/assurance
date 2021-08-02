@@ -1,4 +1,4 @@
-#!/Users/xchen/dev/practice/assurance/env/bin/python
+#!/Users/xchen/dev/practice/assurance/env/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

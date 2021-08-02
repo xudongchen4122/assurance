@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'trivia',
     'trivia.apis',
+    'trivia.tests',
 ]
 
 MIDDLEWARE = [

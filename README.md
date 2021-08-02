@@ -14,3 +14,9 @@ How to run this project:
 12) Sign up as another user and join the game the first person just started
 13) Keep playing
 14) It allows many people to play at the same time
+
+
+How to run unit tests:
+1) Make sure you are still in the virtual environment (check "how to run this project" above)
+2) run the command "export DJANGO_SETTINGS_MODULE=setup.settings"
+3) run the command "pytest"

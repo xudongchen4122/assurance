@@ -6,3 +6,5 @@ typing-extensions==3.10.0.0
 djangorestframework-recursive
 django-bootstrap3
 requests
+pytest
+pytest-django

@@ -19,6 +19,7 @@ class AnswerSerializer(serializers.ModelSerializer):
             'create_date',
         )
 
+    # Before we save this answer, need to calculate the correct_answer field
     def create(self, validated_data):
 
         answer = Answer(**validated_data)
@@ -28,6 +29,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         choices = Choice.objects.filter(question=question).all()
         correct_choice = [choice for choice in choices if choice.correct_answer][0]
         user_id = self.context['request'].user.id
+        # Only one player if a game and user are determined
         player = Player.objects.filter(game__rounds__in=[round.id], user=user_id).first()
         answer.player = player
 

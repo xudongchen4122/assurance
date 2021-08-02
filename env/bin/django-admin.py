@@ -1,4 +1,4 @@
-#!/Users/xchen/dev/practice/assurance/env/bin/python
+#!/Users/xchen/dev/practice/assurance/env/bin/python3
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

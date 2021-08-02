@@ -7,6 +7,7 @@ from setup.settings import MINIMUM_NUMBER_PLAYERS
 import random
 
 
+# This is the home page of http://127.0.0.1
 def index(request):
     if not request.user.is_authenticated:
         latest_posts = None
@@ -18,6 +19,7 @@ def index(request):
         return HttpResponseRedirect('/me/')
 
 
+# This is the landing age when the user logged in
 def me(request):
     if request.user.is_authenticated:
         games = Game.objects.all()
@@ -30,6 +32,7 @@ def me(request):
         return HttpResponseRedirect('/login/')
 
 
+# This is the backend for the login page
 def login_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/post/')
@@ -54,11 +57,13 @@ def login_view(request):
             return render(request, 'login.html', {'form': form})
 
 
+# This is the backend for logout page
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
 
 
+#This is the backend for the signup page
 def signup(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/post/')
@@ -81,6 +86,11 @@ def signup(request):
             return render(request, 'signup.html', {'form': form})
 
 
+# This is the backend for playing game.
+# The core beckend functionality resides here.
+# Every time when the player starts/joins a game,
+# the frontend should have already created a game through ajax call,
+# and then it will send a game_id and round_id.
 def play_game(request):
     if request.user.is_authenticated:
         game_id = request.GET['game']

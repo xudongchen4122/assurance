@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 
 class PlayerSerializer(serializers.ModelSerializer):
 
+    # We need to return username to the frontend so that it could be displayed.
+    # However, this username doesn't exist in player object, so we need to
+    # call a static method to calculate it
     username = serializers.SerializerMethodField()
 
     class Meta:

@@ -9,3 +9,8 @@ class QuestionList(generics.ListCreateAPIView):
     def get_queryset(self):
         q_set = Question.objects.all()
         return q_set
+
+    def create(self, request, *args, **kwargs):
+        if request.data['description'].strip() == '':
+            raise Exception('question.question cannot be whitespace')
+        return super().create(request, *args, **kwargs)
