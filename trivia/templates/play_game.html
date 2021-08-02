@@ -173,5 +173,42 @@
                 alert('You must submit an answer first!');
             }
         }
+        function updateResult(){
+            const round_id = parseInt($('#round_id').val());
+
+            $.ajax({
+                type: "GET",
+                url: 'http://127.0.0.1:8000/answers/?round=' + round_id,
+                success: function (answers) {
+                    if(answers){
+                        let choices = {};
+                        for (let i=0; i<answers.length; i++){
+                            let answer = answers[i];
+                            if (answer.choice in choices){
+                                choices[answer.choice] += 1;
+                            } else {
+                                choices[answer.choice] = 1;
+                            }
+                        }
+
+                        for (let choice in choices) {
+                            $('#answer_' + choice).text(choices[choice].toString() + ' players answered this choice.');
+                        }
+
+
+                        $('#result').show();
+                        let alert_time = parseInt($('#alert_time').val());
+                        alert_time += 1;
+                        $('#alert_time').val(alert_time.toString());
+
+                        const wrong_answer = $('#wrong_answer').val();
+                        if(alert_time == 2 && wrong_answer == 'true'){
+                            alert('Wrong Answer! Game is Over!');
+                            window.location = 'http://127.0.0.1:8000/';
+                        }
+                    }
+                }
+            });
+        }
     </script>
 {% endblock %}
