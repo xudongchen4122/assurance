@@ -121,7 +121,11 @@
                 <div style="font-size: 20px;margin-top: 30px;">Results</div>
                 {% for choice in choices %}
                     <div style="margin-top:10px;margin-bottom:10px; font-size: medium">
-                        <span style="margin-left:10px;">{{ choice.description }} :</span>
+                        {% if choice.correct_answer == True %}
+                            <span style="margin-left:10px;color: white;background-color: darkgreen">{{ choice.description }} :</span>
+                        {% else %}
+                            <span style="margin-left:10px;">{{ choice.description }} :</span>
+                        {% endif %}
                         <span id="answer_{{ choice.id }}"></span>
                     </div>
                 {% endfor %}
