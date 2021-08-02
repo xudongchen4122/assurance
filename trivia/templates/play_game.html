@@ -161,6 +161,7 @@
                             if(answer.correct_answer == true){
                                 $('#btnNext').show();
                                 $('#hide_next').val('false');
+                                updateResult();
                             } else {
                                 $('#game_over').show();
                                 $('#wrong_answer').val('true');
@@ -202,9 +203,17 @@
                         $('#alert_time').val(alert_time.toString());
 
                         const wrong_answer = $('#wrong_answer').val();
-                        if(alert_time == 2 && wrong_answer == 'true'){
-                            alert('Wrong Answer! Game is Over!');
-                            window.location = 'http://127.0.0.1:8000/';
+                        if(alert_time == 2) {
+                            if (wrong_answer =='true'){
+                                alert('Wrong Answer! Game is Over!');
+                                window.location = 'http://127.0.0.1:8000/';
+                            }
+                            else {
+                                if(round_id==5) {
+                                    alert('You are the winner!');
+                                    window.location = 'http://127.0.0.1:8000/';
+                                }
+                            }
                         }
                     }
                 }
